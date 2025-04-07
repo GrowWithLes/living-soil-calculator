@@ -1,0 +1,114 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Living Soil Calculator - Grow With Les v1.1</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        h1 { color: #2c3e50; }
+        label, select, input { display: block; margin-bottom: 10px; }
+        .output { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .footer { margin-top: 40px; font-size: 0.9em; color: gray; }
+    </style>
+</head>
+<body>
+    <h1>Living Soil Calculator – Grow With Les</h1>
+
+    <label for="strain">Strain Name:</label>
+    <input type="text" id="strain" placeholder="e.g., Blueberry OG">
+
+    <label for="plantType">What Type of Plant?</label>
+    <select id="plantType">
+        <option>Photoperiod – Indica-Dominant</option>
+        <option>Photoperiod – Sativa-Dominant</option>
+        <option>Autoflower – Indica-Dominant</option>
+        <option>Autoflower – Sativa-Dominant</option>
+        <option>Hybrid (Photo or Auto)</option>
+        <option>Custom / Unknown</option>
+    </select>
+
+    <label for="feeding">How Hungry is Your Plant? (Feeding Intensity)</label>
+    <select id="feeding">
+        <option>Heavy Feeder 🐘</option>
+        <option>Moderate Feeder 🐕</option>
+        <option>Light Feeder 🐇</option>
+        <option>I don’t know yet 🤷‍♂️</option>
+    </select>
+
+    <label for="soil">Choose Your Soil Base:</label>
+    <select id="soil">
+        <option>FoxFarm Ocean Forest</option>
+        <option>Happy Frog</option>
+        <option>BuildASoil 3.0</option>
+        <option>Mother Earth Terracraft</option>
+        <option>Coast of Maine Stonington Blend</option>
+        <option>Custom Mix (User-defined)</option>
+    </select>
+
+    <label for="gallons">How Many Gallons of Soil Do You Need?</label>
+    <input type="number" id="gallons" min="1" placeholder="e.g., 10">
+
+    <label><input type="checkbox" id="unitToggle"> Show recipe in % by volume instead of Cups/Gallons</label>
+
+    <button onclick="calculateMix()">Calculate My Soil Mix</button>
+
+    <div class="output" id="output">
+        <h2>Your Soil Recipe Will Appear Here</h2>
+        <p>Fill out the form and click the button to calculate your mix.</p>
+    </div>
+
+    <div class="footer">
+        Version: v1.1 – Don’t forget to delete older files after updating. Stay organized, grow smart.
+    </div>
+
+    <script>
+        function calculateMix() {
+            const strain = document.getElementById('strain').value;
+            const plantType = document.getElementById('plantType').value;
+            const feeding = document.getElementById('feeding').value;
+            const soil = document.getElementById('soil').value;
+            const gallons = parseFloat(document.getElementById('gallons').value);
+            const percentMode = document.getElementById('unitToggle').checked;
+
+            let outputText = `<h2>Soil Mix for ${strain || 'Unnamed Strain'}</h2>`;
+            outputText += `<p><strong>Plant Type:</strong> ${plantType}</p>`;
+            outputText += `<p><strong>Feeding Intensity:</strong> ${feeding}</p>`;
+            outputText += `<p><strong>Soil Base:</strong> ${soil}</p>`;
+            outputText += `<p><strong>Gallons:</strong> ${gallons}</p>`;
+
+            if (!isNaN(gallons)) {
+                if (percentMode) {
+                    outputText += `
+                        <ul>
+                            <li>50% Soil Base</li>
+                            <li>25% Compost (Worm Castings + Mushroom Compost)</li>
+                            <li>25% Amendments (see breakdown below)</li>
+                        </ul>
+                    `;
+                } else {
+                    outputText += `
+                        <ul>
+                            <li>${(gallons * 0.5).toFixed(1)} gal Soil Base</li>
+                            <li>${(gallons * 0.25).toFixed(1)} gal Compost</li>
+                        </ul>
+                        <h3>Amendment Breakdown</h3>
+                        <ul>
+                            <li>${(gallons * 0.05).toFixed(1)} cups Blood Meal</li>
+                            <li>${(gallons * 0.05).toFixed(1)} cups Bone Meal</li>
+                            <li>${(gallons * 0.075).toFixed(1)} cups Dr. Earth 4-6-3</li>
+                            <li>${(gallons * 0.0375).toFixed(1)} cups Basalt Rock Dust</li>
+                            <li>${(gallons * 0.025).toFixed(1)} cups Gypsum</li>
+                            <li>${(gallons * 0.025).toFixed(1)} cups Alfalfa Meal (optional)</li>
+                        </ul>
+                    `;
+                }
+            } else {
+                outputText += `<p style="color:red;">Please enter a valid number of gallons.</p>`;
+            }
+
+            document.getElementById('output').innerHTML = outputText;
+        }
+    </script>
+</body>
+</html>
