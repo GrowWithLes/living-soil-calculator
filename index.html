@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Soil Calculator - Grow With Les v1.1</title>
+    <title>Living Soil Calculator - Grow With Les v1.2</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
         h1 { color: #2c3e50; }
@@ -59,7 +59,7 @@
     </div>
 
     <div class="footer">
-        Version: v1.1 – Don’t forget to delete older files after updating. Stay organized, grow smart.
+        Version: v1.2 – With feeding intensity logic. Delete older versions after updating.
     </div>
 
     <script>
@@ -70,6 +70,13 @@
             const soil = document.getElementById('soil').value;
             const gallons = parseFloat(document.getElementById('gallons').value);
             const percentMode = document.getElementById('unitToggle').checked;
+
+            let feedMultiplier = 1;
+            if (feeding.includes('Light')) feedMultiplier = 0.75;
+            else if (feeding.includes('Heavy')) feedMultiplier = 1.25;
+
+            // Reduce all values for autoflowers
+            if (plantType.includes('Autoflower')) feedMultiplier *= 0.85;
 
             let outputText = `<h2>Soil Mix for ${strain || 'Unnamed Strain'}</h2>`;
             outputText += `<p><strong>Plant Type:</strong> ${plantType}</p>`;
@@ -94,12 +101,12 @@
                         </ul>
                         <h3>Amendment Breakdown</h3>
                         <ul>
-                            <li>${(gallons * 0.05).toFixed(1)} cups Blood Meal</li>
-                            <li>${(gallons * 0.05).toFixed(1)} cups Bone Meal</li>
-                            <li>${(gallons * 0.075).toFixed(1)} cups Dr. Earth 4-6-3</li>
-                            <li>${(gallons * 0.0375).toFixed(1)} cups Basalt Rock Dust</li>
-                            <li>${(gallons * 0.025).toFixed(1)} cups Gypsum</li>
-                            <li>${(gallons * 0.025).toFixed(1)} cups Alfalfa Meal (optional)</li>
+                            <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Blood Meal</li>
+                            <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Bone Meal</li>
+                            <li>${(gallons * 0.075 * feedMultiplier).toFixed(1)} cups Dr. Earth 4-6-3</li>
+                            <li>${(gallons * 0.0375 * feedMultiplier).toFixed(1)} cups Basalt Rock Dust</li>
+                            <li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Gypsum</li>
+                            <li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Alfalfa Meal (optional)</li>
                         </ul>
                     `;
                 }
