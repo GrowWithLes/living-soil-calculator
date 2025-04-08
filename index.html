@@ -188,6 +188,29 @@
             `;
         }
 
+        // Add soil cooking message if applicable
+        if (cookStart) {
+            const now = new Date();
+            const startDate = new Date(cookStart);
+            const cookDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            const daysLeft = Math.max(0, 28 - cookDays);
+            outputText += `
+                <div class="timer">
+                    <strong>Soil Cooking Status:</strong><br>
+                    ${cookDays} days since mixing.<br>
+                    ${daysLeft > 0 ? `${daysLeft} days left to finish cooking.` : `✅ Soil has cooked for 4+ weeks.`}<br>
+                    Turn your soil once per week to keep it active.
+                </div>
+            `;
+        } else {
+            outputText += `
+                <div class="timer">
+                    ⚠️ Let this soil mix cook for <strong>4 weeks</strong> before planting.<br>
+                    Turn the mix once per week to promote microbial activity.
+                </div>
+            `;
+        }
+
         document.getElementById('output').innerHTML = outputText;
     }
 
