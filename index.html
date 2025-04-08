@@ -24,7 +24,8 @@
             margin-bottom: 10px;
         }
         input[type="text"], input[type="number"], input[type="date"], select {
-            width: 100%;
+            width: 25%;
+            min-width: 250px;
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
@@ -76,12 +77,22 @@
             font-style: italic;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
+        .image-banner {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .image-banner img {
+            max-width: 25%;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
-
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="GetAttachmentThumbnail.jpg" alt="Grow With Les" style="max-width: 50%; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+<body>
+    <div class="image-banner">
+        <img src="GetAttachmentThumbnail.jpg" alt="Grow With Les">
     </div>
+
     <h1>Living Soil Calculator – Grow With Les</h1>
 
     <label for="strain">Strain Name:</label>
@@ -89,7 +100,7 @@
 
     <label for="plantType">What Type of Plant?</label>
     <select id="plantType">
-        <option value="" disabled selected>Select an option</option>
+        <option value="">Select an option</option>
         <option>Photoperiod – Indica-Dominant</option>
         <option>Photoperiod – Sativa-Dominant</option>
         <option>Autoflower – Indica-Dominant</option>
@@ -100,7 +111,7 @@
 
     <label for="feeding">How Hungry is Your Plant? (Feeding Intensity)</label>
     <select id="feeding">
-        <option value="" disabled selected>Select an option</option>
+        <option value="">Select an option</option>
         <option>Heavy Feeder 🐘</option>
         <option>Moderate Feeder 🐕</option>
         <option>Light Feeder 🐇</option>
@@ -109,7 +120,7 @@
 
     <label for="soil">Choose Your Soil Base:</label>
     <select id="soil">
-        <option value="" disabled selected>Select an option</option>
+        <option value="">Select an option</option>
         <option>FoxFarm Ocean Forest</option>
         <option>Happy Frog</option>
         <option>BuildASoil 3.0</option>
@@ -130,178 +141,182 @@
     <button onclick="calculateMix()">Calculate My Soil Mix</button>
     <button onclick="resetForm()">Reset</button>
 
-    <div class="output" id="output" aria-live="polite">
+    <div class="planty-tip" id="plantyTip">🌱 Planty says: Let's build some living soil!</div>
+    <div class="output" id="output">
         <h2>Your Soil Recipe Will Appear Here</h2>
         <p>Fill out the form and click the button to calculate your mix.</p>
     </div>
 
-    <div class="planty-tip" id="plantyTip"></div>
-
     <div class="footer">
-        Version: v1.5 – Now featuring Planty's Tips & a softer new look.
+        Version: v1.5 – Don’t forget to delete older files after updating. Stay organized, grow smart.
     </div>
 
     <script>
-    function calculateMix() {
-        const missingFields = []; // Ensure this is reset before adding new fields
-        const strain = document.getElementById('strain').value;
-        const plantType = document.getElementById('plantType').value;
-        const feeding = document.getElementById('feeding').value;
-        const soil = document.getElementById('soil').value;
-        const gallonsInput = document.getElementById('gallons');
-        const gallons = parseFloat(gallonsInput.value);
-        const percentMode = document.getElementById('unitToggle').checked;
-        const includeAlfalfa = document.getElementById('includeAlfalfa').checked;
-        const cookStart = document.getElementById('cookStart').value;
+        function calculateMix() {
+            const missingFields = [];
+            const strain = document.getElementById('strain').value;
+            const plantType = document.getElementById('plantType').value;
+            const feeding = document.getElementById('feeding').value;
+            const soil = document.getElementById('soil').value;
+            const gallonsInput = document.getElementById('gallons');
+            const gallons = parseFloat(gallonsInput.value);
+            const percentMode = document.getElementById('unitToggle').checked;
+            const includeAlfalfa = document.getElementById('includeAlfalfa').checked;
+            const cookStart = document.getElementById('cookStart').value;
 
-        const tip = document.getElementById('plantyTip');
+            const tip = document.getElementById('plantyTip');
 
-        // Validate required fields
-        if (!strain || !plantType || !feeding || !soil) {
-            if (!strain) missingFields.push(document.getElementById('strain'));
-            if (!plantType) missingFields.push(document.getElementById('plantType'));
-            if (!feeding) missingFields.push(document.getElementById('feeding'));
-            if (!soil) missingFields.push(document.getElementById('soil'));
+            if (!strain || !plantType || !feeding || !soil) {
+                if (!strain) missingFields.push(document.getElementById('strain'));
+                if (!plantType) missingFields.push(document.getElementById('plantType'));
+                if (!feeding) missingFields.push(document.getElementById('feeding'));
+                if (!soil) missingFields.push(document.getElementById('soil'));
 
-            missingFields.forEach(field => {
-                field.style.border = '2px solid red';
-            });
+                missingFields.forEach(field => {
+                    field.style.border = '2px solid red';
+                });
 
-            let plantyMessage = "🌱 Planty says: Let's get those blanks filled in before we mix!";
-            if (!strain) plantyMessage = "🌱 Planty says: What strain are we growing? Gotta name your baby!";
-            else if (!plantType) plantyMessage = "🌱 Planty says: Pick your plant type so I know how it grows.";
-            else if (!feeding) plantyMessage = "🌱 Planty says: Tell me how hungry your plant is — I won’t judge!";
-            else if (!soil) plantyMessage = "🌱 Planty says: What soil are we starting with? I need the dirt on your dirt!";
-            tip.innerHTML = plantyMessage;
-            document.getElementById('output').innerHTML = `<p style='color:red;'>Please fill in all required fields.</p>`;
-            missingFields[0].scrollIntoView({ behavior: 'smooth' });
-            return;
-        } else {
-            document.getElementById('strain').style.border = '';
-            document.getElementById('plantType').style.border = '';
-            document.getElementById('feeding').style.border = '';
-            document.getElementById('soil').style.border = '';
-        }
-
-        // Validate gallons input
-        if (isNaN(gallons) || gallons <= 0) {
-            gallonsInput.style.border = '2px solid red';
-            tip.innerHTML = "🌱 Planty says: Please enter a valid positive number of gallons.";
-            return;
-        } else {
-            gallonsInput.style.border = ''; // Reset border on valid input
-        }
-
-        // Validate cookStart date
-        if (cookStart) {
-            const now = new Date();
-            const startDate = new Date(cookStart);
-
-            if (startDate > now) {
-                document.getElementById('cookStart').style.border = '2px solid red';
-                tip.innerHTML = "🌱 Planty says: The start date cannot be in the future. Please enter a valid date.";
+                let plantyMessage = "🌱 Planty says: Let's get those blanks filled in before we mix!";
+                if (!strain) plantyMessage = "🌱 Planty says: What strain are we growing? Gotta name your baby!";
+                else if (!plantType) plantyMessage = "🌱 Planty says: Pick your plant type so I know how it grows.";
+                else if (!feeding) plantyMessage = "🌱 Planty says: Tell me how hungry your plant is — I won’t judge!";
+                else if (!soil) plantyMessage = "🌱 Planty says: What soil are we starting with? I need the dirt on your dirt!";
+                tip.innerHTML = plantyMessage;
+                document.getElementById('output').innerHTML = `<p style='color:red;'>Please fill in all required fields.</p>`;
+                missingFields[0].scrollIntoView({ behavior: 'smooth' });
                 return;
             } else {
-                document.getElementById('cookStart').style.border = ''; // Reset border on valid input
+                document.getElementById('strain').style.border = '';
+                document.getElementById('plantType').style.border = '';
+                document.getElementById('feeding').style.border = '';
+                document.getElementById('soil').style.border = '';
             }
+
+            if (isNaN(gallons) || gallons <= 0) {
+                gallonsInput.style.border = '2px solid red';
+                tip.innerHTML = "🌱 Planty says: Please enter a valid positive number of gallons.";
+                return;
+            } else {
+                gallonsInput.style.border = '';
+            }
+
+            if (cookStart) {
+                const now = new Date();
+                const startDate = new Date(cookStart);
+                if (startDate > now) {
+                    document.getElementById('cookStart').style.border = '2px solid red';
+                    tip.innerHTML = "🌱 Planty says: The start date cannot be in the future. Please enter a valid date.";
+                    return;
+                } else {
+                    document.getElementById('cookStart').style.border = '';
+                }
+            }
+
+            tip.innerHTML = `${getPlantyTip(plantType, feeding)}<br>${getRandomTip()}`;
+
+            let feedMultiplier = 1;
+            if (feeding.includes("Light")) feedMultiplier = 0.75;
+            else if (feeding.includes("Heavy")) feedMultiplier = 1.25;
+            if (plantType.includes("Auto")) feedMultiplier *= 0.85;
+
+            let outputText = `<h2>Soil Mix for ${strain || 'Generic Strain'}</h2>`;
+            outputText += `<p><strong>Plant Type:</strong> ${plantType}</p>`;
+            outputText += `<p><strong>Feeding Intensity:</strong> ${feeding}</p>`;
+            outputText += `<p><strong>Soil Base:</strong> ${soil}</p>`;
+            outputText += `<p><strong>Gallons:</strong> ${gallons}</p>`;
+
+            if (percentMode) {
+                outputText += `
+                    <ul>
+                        <li>50% Soil Base</li>
+                        <li>25% Compost (Worm Castings + Mushroom Compost)</li>
+                        <li>25% Amendments (see breakdown below)</li>
+                    </ul>
+                `;
+            } else {
+                outputText += `
+                    <ul>
+                        <li>${(gallons * 0.5).toFixed(1)} gal Soil Base</li>
+                        <li>${(gallons * 0.25).toFixed(1)} gal Compost</li>
+                    </ul>
+                    <h3>Amendment Breakdown</h3>
+                    <ul>
+                        <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Blood Meal</li>
+                        <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Bone Meal</li>
+                        <li>${(gallons * 0.075 * feedMultiplier).toFixed(1)} cups Dr. Earth 4-6-3</li>
+                        <li>${(gallons * 0.0375 * feedMultiplier).toFixed(1)} cups Basalt Rock Dust</li>
+                        <li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Gypsum</li>
+                        ${includeAlfalfa ? `<li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Alfalfa Meal (optional)</li>` : ''}
+                    </ul>
+                `;
+            }
+
+            if (cookStart) {
+                const now = new Date();
+                const startDate = new Date(cookStart);
+                const cookDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+                const daysLeft = Math.max(0, 28 - cookDays);
+                outputText += `
+                    <div class="timer">
+                        <strong>Soil Cooking Status:</strong><br>
+                        ${cookDays} days since mixing.<br>
+                        ${daysLeft > 0 ? `${daysLeft} days left to finish cooking.` : `✅ Soil has cooked for 4+ weeks.`}<br>
+                        Turn your soil once per week to keep it active.
+                    </div>
+                `;
+            } else {
+                outputText += `
+                    <div class="timer">
+                        ⚠️ Let this soil mix cook for <strong>4 weeks</strong> before planting.<br>
+                        Turn the mix once per week to promote microbial activity.
+                    </div>
+                `;
+            }
+
+            document.getElementById('output').innerHTML = outputText;
         }
 
-        // Generate Planty Tip
-        tip.innerHTML = `${getPlantyTip(plantType, feeding)}<br>${getRandomTip()}`;
-
-        // Calculate Soil Mix
-        let feedMultiplier = 1;
-        if (feeding.includes("Light")) feedMultiplier = 0.75;
-        else if (feeding.includes("Heavy")) feedMultiplier = 1.25;
-        if (plantType.includes("Auto")) feedMultiplier *= 0.85;
-
-        let outputText = `<h2>Soil Mix for ${strain || 'Generic Strain'}</h2>`;
-        outputText += `<p><strong>Plant Type:</strong> ${plantType}</p>`;
-        outputText += `<p><strong>Feeding Intensity:</strong> ${feeding}</p>`;
-        outputText += `<p><strong>Soil Base:</strong> ${soil}</p>`;
-        outputText += `<p><strong>Gallons:</strong> ${gallons}</p>`;
-
-        if (percentMode) {
-            outputText += `
-                <ul>
-                    <li>50% Soil Base</li>
-                    <li>25% Compost (Worm Castings + Mushroom Compost)</li>
-                    <li>25% Amendments (see breakdown below)</li>
-                </ul>
-            `;
-        } else {
-            outputText += `
-                <ul>
-                    <li>${(gallons * 0.5).toFixed(1)} gal Soil Base</li>
-                    <li>${(gallons * 0.25).toFixed(1)} gal Compost</li>
-                </ul>
-                <h3>Amendment Breakdown</h3>
-                <ul>
-                    <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Blood Meal</li>
-                    <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Bone Meal</li>
-                    <li>${(gallons * 0.075 * feedMultiplier).toFixed(1)} cups Dr. Earth 4-6-3</li>
-                    <li>${(gallons * 0.0375 * feedMultiplier).toFixed(1)} cups Basalt Rock Dust</li>
-                    <li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Gypsum</li>
-                    ${includeAlfalfa ? `<li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Alfalfa Meal (optional)</li>` : ''}
-                </ul>
-            `;
+        function getPlantyTip(plantType, feeding) {
+            if (plantType.includes("Auto")) {
+                return "🌱 Planty says: Autos are sensitive! We’ve toned down the amendment strength just for them.";
+            }
+            if (feeding.includes("Heavy")) {
+                return "🌱 Planty says: You picked a heavy feeder — don’t skimp on compost and microbial life.";
+            }
+            if (feeding.includes("Light")) {
+                return "🌱 Planty says: Light feeders thrive in balanced soil — keep it mellow, don’t go overboard.";
+            }
+            return "🌱 Planty says: Balanced feeding and rich soil lead to happy roots. Let’s mix it right!";
         }
 
-        // Add soil cooking message if applicable
-        if (cookStart) {
-            const now = new Date();
-            const startDate = new Date(cookStart);
-            const cookDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-            const daysLeft = Math.max(0, 28 - cookDays);
-            outputText += `
-                <div class="timer">
-                    <strong>Soil Cooking Status:</strong><br>
-                    ${cookDays} days since mixing.<br>
-                    ${daysLeft > 0 ? `${daysLeft} days left to finish cooking.` : `✅ Soil has cooked for 4+ weeks.`}<br>
-                    Turn your soil once per week to keep it active.
-                </div>
-            `;
-        } else {
-            outputText += `
-                <div class="timer">
-                    ⚠️ Let this soil mix cook for <strong>4 weeks</strong> before planting.<br>
-                    Turn the mix once per week to promote microbial activity.
-                </div>
-            `;
+        function getRandomTip() {
+            const tips = [
+                "🌱 Worm castings are a great source of nutrients for your plants!",
+                "🌱 Turn your soil weekly to keep it active and aerated.",
+                "🌱 Adding mycorrhizal fungi can supercharge your plant's root system.",
+                "🌱 Overwatering is one of the most common mistakes in gardening.",
+                "🌱 Healthy soil = healthy plants. Focus on building microbial life in your mix.",
+                "🌱 Compost tea can give your plants a quick nutrient boost!",
+                "🌱 Mulching helps retain moisture and suppress weeds in your garden.",
+                "🌱 Always let your soil cook for at least 4 weeks for the best results.",
+                "🌱 Adding biochar can improve soil structure and nutrient retention.",
+                "🌱 Keep an eye on pH levels to ensure your plants can absorb nutrients effectively."
+            ];
+            const randomIndex = Math.floor(Math.random() * tips.length);
+            return tips[randomIndex];
         }
 
-        document.getElementById('output').innerHTML = outputText;
-    }
+        function resetForm() {
+            document.getElementById('strain').value = '';
+            document.getElementById('plantType').selectedIndex = 0;
+            document.getElementById('feeding').selectedIndex = 0;
+            document.getElementById('soil').selectedIndex = 0;
+            document.getElementById('gallons').value = '';
+            document.getElementById('unitToggle').checked = false;
+            document.getElementById('includeAlfalfa').checked = false;
+            document.getElementById('cookStart').value = '';
+            document.getElementById('plantyTip').innerHTML = "🌱 Planty says: Let's build some living soil!";
+            document.getElementById('output').innerHTML = `<h2>Your Soil Recipe Will Appear Here</h2><p>Fill out the form and click the button to calculate your mix.</p>`;
+        }
+    </script>
 
-    function getPlantyTip(plantType, feeding) {
-        if (plantType.includes("Auto")) {
-            return "🌱 Planty says: Autos are sensitive! We’ve toned down the amendment strength just for them.";
-        }
-        if (feeding.includes("Heavy")) {
-            return "🌱 Planty says: You picked a heavy feeder — don’t skimp on compost and microbial life.";
-        }
-        if (feeding.includes("Light")) {
-            return "🌱 Planty says: Light feeders thrive in balanced soil — keep it mellow, don’t go overboard.";
-        }
-        return "🌱 Planty says: Balanced feeding and rich soil lead to happy roots. Let’s mix it right!";
-    }
-
-    function getRandomTip() {
-        const tips = [
-            "🌱 Worm castings are a great source of nutrients for your plants!",
-            "🌱 Turn your soil weekly to keep it active and aerated.",
-            "🌱 Adding mycorrhizal fungi can supercharge your plant's root system.",
-            "🌱 Overwatering is one of the most common mistakes in gardening.",
-            "🌱 Healthy soil = healthy plants. Focus on building microbial life in your mix.",
-            "🌱 Compost tea can give your plants a quick nutrient boost!",
-            "🌱 Mulching helps retain moisture and suppress weeds in your garden.",
-            "🌱 Always let your soil cook for at least 4 weeks for the best results.",
-            "🌱 Adding biochar can improve soil structure and nutrient retention.",
-            "🌱 Keep an eye on pH levels to ensure your plants can absorb nutrients effectively."
-        ];
-        const randomIndex = Math.floor(Math.random() * tips.length);
-        return tips[randomIndex];
-    }
-</script>
-</body>
-</html>
