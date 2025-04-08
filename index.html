@@ -5,24 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Living Soil Calculator - Grow With Les v1.5</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f1ed; }
-        h1 { color: #2c3e50; }
-        label, select, input { display: block; margin-bottom: 10px; }
-        .output { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .footer { margin-top: 40px; font-size: 0.9em; color: gray; }
-        .timer { background: #ffeeba; border: 1px solid #f0ad4e; padding: 10px; border-radius: 8px; margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f4f1ed;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            background: #dfe6e9;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        label, select, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .output {
+            margin-top: 20px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: gray;
+            text-align: center;
+        }
+        .timer {
+            background: #ffeeba;
+            border: 1px solid #f0ad4e;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
         .planty-tip {
             margin-top: 20px;
             background-color: #e0f7fa;
             border-left: 5px solid #00acc1;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-style: italic;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
     </style>
 </head>
-<body>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="GetAttachmentThumbnail.jpg" alt="Grow With Les" style="max-width: 50%; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    </div>
     <h1>Living Soil Calculator – Grow With Les</h1>
 
     <label for="strain">Strain Name:</label>
