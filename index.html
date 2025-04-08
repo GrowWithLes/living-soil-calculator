@@ -150,8 +150,45 @@
         // Generate Planty Tip
         tip.innerHTML = `${getPlantyTip(plantType, feeding)}<br>${getRandomTip()}`;
 
-        // Continue with rest of the existing calculation logic here...
-        document.getElementById('output').innerHTML = `<p>Your soil mix has been calculated successfully!</p>`;
+        // Calculate Soil Mix
+        let feedMultiplier = 1;
+        if (feeding.includes("Light")) feedMultiplier = 0.75;
+        else if (feeding.includes("Heavy")) feedMultiplier = 1.25;
+        if (plantType.includes("Auto")) feedMultiplier *= 0.85;
+
+        let outputText = `<h2>Soil Mix for ${strain || 'Generic Strain'}</h2>`;
+        outputText += `<p><strong>Plant Type:</strong> ${plantType}</p>`;
+        outputText += `<p><strong>Feeding Intensity:</strong> ${feeding}</p>`;
+        outputText += `<p><strong>Soil Base:</strong> ${soil}</p>`;
+        outputText += `<p><strong>Gallons:</strong> ${gallons}</p>`;
+
+        if (percentMode) {
+            outputText += `
+                <ul>
+                    <li>50% Soil Base</li>
+                    <li>25% Compost (Worm Castings + Mushroom Compost)</li>
+                    <li>25% Amendments (see breakdown below)</li>
+                </ul>
+            `;
+        } else {
+            outputText += `
+                <ul>
+                    <li>${(gallons * 0.5).toFixed(1)} gal Soil Base</li>
+                    <li>${(gallons * 0.25).toFixed(1)} gal Compost</li>
+                </ul>
+                <h3>Amendment Breakdown</h3>
+                <ul>
+                    <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Blood Meal</li>
+                    <li>${(gallons * 0.05 * feedMultiplier).toFixed(1)} cups Bone Meal</li>
+                    <li>${(gallons * 0.075 * feedMultiplier).toFixed(1)} cups Dr. Earth 4-6-3</li>
+                    <li>${(gallons * 0.0375 * feedMultiplier).toFixed(1)} cups Basalt Rock Dust</li>
+                    <li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Gypsum</li>
+                    ${includeAlfalfa ? `<li>${(gallons * 0.025 * feedMultiplier).toFixed(1)} cups Alfalfa Meal (optional)</li>` : ''}
+                </ul>
+            `;
+        }
+
+        document.getElementById('output').innerHTML = outputText;
     }
 
     function getPlantyTip(plantType, feeding) {
