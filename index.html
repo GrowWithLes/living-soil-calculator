@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Soil Calculator - Grow With Les v1.2</title>
+    <title>Living Soil Calculator - Grow With Les v1.4</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
         h1 { color: #2c3e50; }
         label, select, input { display: block; margin-bottom: 10px; }
         .output { margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .footer { margin-top: 40px; font-size: 0.9em; color: gray; }
+        .timer { background: #ffeeba; border: 1px solid #f0ad4e; padding: 10px; border-radius: 8px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -20,6 +21,7 @@
 
     <label for="plantType">What Type of Plant?</label>
     <select id="plantType">
+        <option value="" disabled selected>Select an option</option>
         <option>Photoperiod – Indica-Dominant</option>
         <option>Photoperiod – Sativa-Dominant</option>
         <option>Autoflower – Indica-Dominant</option>
@@ -30,6 +32,7 @@
 
     <label for="feeding">How Hungry is Your Plant? (Feeding Intensity)</label>
     <select id="feeding">
+        <option value="" disabled selected>Select an option</option>
         <option>Heavy Feeder 🐘</option>
         <option>Moderate Feeder 🐕</option>
         <option>Light Feeder 🐇</option>
@@ -38,6 +41,7 @@
 
     <label for="soil">Choose Your Soil Base:</label>
     <select id="soil">
+        <option value="" disabled selected>Select an option</option>
         <option>FoxFarm Ocean Forest</option>
         <option>Happy Frog</option>
         <option>BuildASoil 3.0</option>
@@ -52,16 +56,19 @@
     <label><input type="checkbox" id="unitToggle"> Show recipe in % by volume instead of Cups/Gallons</label>
     <label><input type="checkbox" id="includeAlfalfa"> Include Alfalfa Meal</label>
 
+    <label for="cookStart">When did you start cooking your soil?</label>
+    <input type="date" id="cookStart">
+
     <button onclick="calculateMix()">Calculate My Soil Mix</button>
     <button onclick="resetForm()">Reset</button>
 
-    <div class="output" id="output">
+    <div class="output" id="output" aria-live="polite">
         <h2>Your Soil Recipe Will Appear Here</h2>
         <p>Fill out the form and click the button to calculate your mix.</p>
     </div>
 
     <div class="footer">
-        Version: v1.2 – With feeding logic and optional alfalfa. Delete older versions after updating.
+        Version: v1.4 – Improved validation, accessibility, and visual cues for input errors.
     </div>
 
     <script>
@@ -73,6 +80,7 @@
             const gallons = parseFloat(document.getElementById('gallons').value);
             const percentMode = document.getElementById('unitToggle').checked;
             const includeAlfalfa = document.getElementById('includeAlfalfa').checked;
+            const cookStart = document.getElementById('cookStart').value;
 
             let outputText = `<h2>Soil Mix for ${strain || 'Generic Strain'}</h2>`;
             outputText += `<p><strong>Plant Type:</strong> ${plantType}</p>`;
@@ -80,16 +88,24 @@
             outputText += `<p><strong>Soil Base:</strong> ${soil}</p>`;
             outputText += `<p><strong>Gallons:</strong> ${gallons}</p>`;
 
+            if (!strain || !plantType || !feeding || !soil) {
+                outputText += `<p style="color:red;">Please fill in all required fields.</p>`;
+                document.getElementById('output').innerHTML = outputText;
+                return;
+            }
+
             if (isNaN(gallons) || gallons <= 0) {
+                document.getElementById('gallons').style.border = '2px solid red';
                 outputText += `<p style="color:red;">Please enter a valid positive number of gallons.</p>`;
                 document.getElementById('output').innerHTML = outputText;
                 return;
+            } else {
+                document.getElementById('gallons').style.border = '';
             }
 
             let feedMultiplier = 1;
             if (feeding.includes('Light')) feedMultiplier = 0.75;
             else if (feeding.includes('Heavy')) feedMultiplier = 1.25;
-
             if (plantType.includes('Autoflower')) feedMultiplier *= 0.85;
 
             if (percentMode) {
@@ -118,6 +134,38 @@
                 `;
             }
 
+            if (cookStart) {
+                const now = new Date();
+                const startDate = new Date(cookStart);
+
+                if (startDate > now) {
+                    document.getElementById('cookStart').style.border = '2px solid red';
+                    outputText += `<p style="color:red;">The start date cannot be in the future. Please enter a valid date.</p>`;
+                    document.getElementById('output').innerHTML = outputText;
+                    return;
+                } else {
+                    document.getElementById('cookStart').style.border = '';
+                }
+
+                const cookDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+                const daysLeft = Math.max(0, 28 - cookDays);
+                outputText += `
+                    <div class="timer">
+                        <strong>Soil Cooking Status:</strong><br>
+                        ${cookDays} days since mixing.<br>
+                        ${daysLeft > 0 ? `${daysLeft} days left to finish cooking.` : `✅ Soil has cooked for 4+ weeks.`}<br>
+                        Turn your soil once per week to keep it active.
+                    </div>
+                `;
+            } else {
+                outputText += `
+                    <div class="timer">
+                        ⚠️ Let this soil mix cook for <strong>4 weeks</strong> before planting.<br>
+                        Turn the mix once per week to promote microbial activity.
+                    </div>
+                `;
+            }
+
             document.getElementById('output').innerHTML = outputText;
         }
 
@@ -129,6 +177,9 @@
             document.getElementById('gallons').value = '';
             document.getElementById('unitToggle').checked = false;
             document.getElementById('includeAlfalfa').checked = false;
+            document.getElementById('cookStart').value = '';
+            document.getElementById('gallons').style.border = '';
+            document.getElementById('cookStart').style.border = '';
             document.getElementById('output').innerHTML = `
                 <h2>Your Soil Recipe Will Appear Here</h2>
                 <p>Fill out the form and click the button to calculate your mix.</p>
